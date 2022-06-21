@@ -51,6 +51,17 @@ invalid_pilot_str:
 pilot_id:
     .long 0
 
+v_max:              #velocità massima trovata
+    .long 0
+rpm_max:            #numero di giri massimo
+    .long 0
+temp_max:           #temperatura massima
+    .long 0
+v_media:            #velocità media
+    .long 0
+num_righe:          #numero di righe corrispondenti al pilota da analizzare
+    .long 0
+
 .section .text
 .global telemetry
 
@@ -65,9 +76,11 @@ push %ebx
 push %ecx
 push %edx
 
-xorl %edx, %edx                     #offset per il nome del pilota da cercare
+#xorl %edx, %edx                     #offset per il nome del pilota da cercare
 
-#ricerca pilota
+#RICERCA ID DEL PILOTA
+
+push %esi
 
 leal pilot_0_str, %eax              #puntatore al primo carattere del vettore
 leal pilot_19_str, %ebx             #puntatore all'ultimo carattere
@@ -77,16 +90,16 @@ ciclo_stringhe_piloti:
 
     ciclo_stringa:
     movb (%eax), %cl                #carattere del pilota da confrontare
-    movb (%esi, %edx), %ch          #carattere del pilota di input
+    movb (%esi), %ch          #carattere del pilota di input
     cmp %cl, %ch                    #controllo se i caratteri sono uguali
     jnz stringhe_diverse
 
-    #se i caratteri sono uguali e siamo arrivati allo "\n"(fine stringa) allora vuol dire che le stringhe uguali
+    #se i caratteri sono uguali e siamo arrivati allo "\n"(fine stringa) allora vuol dire che le stringhe sono uguali
     cmp $10, %ch
     jz pilota_trovato
 
     #altrimenti andiamo al prossimo carattere
-    inc %edx
+    inc %esi
     inc %eax
     jmp ciclo_stringa
 
@@ -102,24 +115,29 @@ ciclo_stringhe_piloti:
     #siamo arrivati alla fine della stringa
     fine_stringa:
     incl pilot_id
-    xorl %edx, %edx
-    incl %eax
+    movl (%esp), %esi #reset di esi al valore iniziale
+    inc %eax
     
 cmpl %eax, %ebx
 jnz ciclo_stringhe_piloti
 
 #se arriviamo alla fine senza saltare a pilota_trovato allora non è stato trovato il pilota
-leal invalid_pilot_str, %eax
-movl (%eax), %ecx
-movl %ecx, (%edi)
-movl 4(%eax), %ecx
-movl %ecx, 4(%edi)
+pop %esi
+
+#stampa invalid
+leal invalid_pilot_str, %esi
+call copia_stringa
 jmp fine_programma
 
 pilota_trovato:
-movb pilot_id, %al
-addb $48, %al
-movb %al, (%edi)
+addl $4, %esp               #elimino il vecchio valore di esi dallo stack
+movb pilot_id, %al#
+addb $48, %al#
+movb %al, (%edi)#
+inc %edi
+inc %esi
+
+#LETTURA DELLE RIGHE DEL FILE
 
 fine_programma:
 

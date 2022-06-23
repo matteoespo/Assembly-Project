@@ -1,0 +1,8 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/v3nom/Documents/UNI/Architettura/Elaborato_ASM/ElaboratoAssembly'
+gcc -m32 -c -g src/telemetry.s -o obj/telemetry.o
+gcc -m32 -c -g src/copia_stringa.s -o obj/copia_stringa.o
+gcc -m32 -c -g src/main.c -o obj/main.o
+gcc -m32 -g obj/telemetry.o obj/copia_stringa.o obj/main.o -o bin/telemetry
+make: Leaving directory '/home/v3nom/Documents/UNI/Architettura/Elaborato_ASM/ElaboratoAssembly'
+ 

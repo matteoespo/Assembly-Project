@@ -50,7 +50,6 @@ invalid_pilot_str:
 
 pilot_id:
     .long 0
-
 v_max:              #velocità massima trovata
     .long 0
 rpm_max:            #numero di giri massimo
@@ -75,8 +74,7 @@ push %eax
 push %ebx
 push %ecx
 push %edx
-
-#xorl %edx, %edx                     #offset per il nome del pilota da cercare
+push %ebp
 
 #RICERCA ID DEL PILOTA
 
@@ -90,7 +88,7 @@ ciclo_stringhe_piloti:
 
     ciclo_stringa:
     movb (%eax), %cl                #carattere del pilota da confrontare
-    movb (%esi), %ch          #carattere del pilota di input
+    movb (%esi), %ch                #carattere del pilota di input
     cmp %cl, %ch                    #controllo se i caratteri sono uguali
     jnz stringhe_diverse
 
@@ -131,20 +129,37 @@ jmp fine_programma
 
 pilota_trovato:
 addl $4, %esp               #elimino il vecchio valore di esi dallo stack
-movb pilot_id, %al#
-addb $48, %al#
-movb %al, (%edi)#
-inc %edi
+
 inc %esi
 
 #LETTURA DELLE RIGHE DEL FILE
 
+#metto nello stack gli indirizzi dei parametri
+#leal pilot_id, %eax
+#pushl %eax
+#leal v_max, %eax
+#pushl %eax
+#leal rpm_max, %eax
+#pushl %eax
+#leal temp_max, %eax
+#pushl %eax
+#leal v_media, %eax
+#pushl %eax
+#
+#call leggi_riga
+#
+#elimino i parametri dallo stack
+#addl $20, %esp
+
 fine_programma:
 
 #backup dei registri generali
+pop %ebp
 pop %edx
 pop %ecx
 pop %ebx
 pop %eax
 
 ret
+
+

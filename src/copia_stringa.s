@@ -1,5 +1,5 @@
-#funzione che copia una stringa da un indirizzo sorgente ad uno destinazione fino al carattere di terminazione "\0"
-#l'indirizzo sorgente deve essere contenuto in esi mentre la destinazione di edi
+# funzione che copia una stringa da un indirizzo sorgente ad uno destinazione fino al carattere di terminazione "\0"
+# l'indirizzo sorgente deve essere contenuto in esi mentre la destinazione di edi
 
 .section .data
 .section .text

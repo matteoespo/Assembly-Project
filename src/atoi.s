@@ -1,6 +1,6 @@
 # funzione che converte una stringa in numero
 # Parametri di input:
-#   EDI - Stringa da convertire
+#   ESI - Stringa da convertire
 # Parametri di output:
 #   EAX - Valore convertito
 
@@ -10,14 +10,17 @@
 
 .type atoi, @function
 
-_atoi:
+atoi:
+	# Salviataggio dei registri generali da usare
+	pushl %ebx
+
 	xorl %eax, %eax   # azzero il registro EAX per contenere il risultato
 	xorl %ebx, %ebx   # azzero EBX
 	movl $10, %ecx    # sposto 10 in ECX che conterrà il valore moltiplicativo
 
 _atoi_loop:
 	xorl %ebx, %ebx
-	movb (%edi), %bl  # sposto un byte dalla stringa in BL
+	movb (%esi), %bl  # sposto un byte dalla stringa in BL
 	subb $48, %bl     # sottraggo il valore ASCII dello 0 a BL, per avere un valore intero
 
 	cmpb $0, %bl      # Se il numero è minore di 0
@@ -27,9 +30,11 @@ _atoi_loop:
 
 	mull %ecx         # altrimenti moltiplico EAX per 10 (10 messo precedentemente in ECX)
 	addl %ebx, %eax   # aggiungo a EAX il valore attuale
-	incl %edi         # incremento EDI
+	incl %esi         # incremento ESI
 
 	jmp _atoi_loop    # rieseguo il ciclo
 
 _atoi_end:
+	popl %ebx
+
 	ret

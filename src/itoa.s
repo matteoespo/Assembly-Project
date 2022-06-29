@@ -1,6 +1,8 @@
 #
 # Questa funzione converte <num> in stringa.
 # La stringa viene scritta in <output>.
+# 
+# <num> deve essere contenuto in eax mentre <output> in edi
 #
 
 .data
@@ -20,7 +22,6 @@ itoa:
     pushl %ebx
     pushl %ecx
     pushl %edx
-    pushl %edi
 
     # inizia algoritmo per convertire intero in stringa
     movl 8(%ebp), %eax            # EAX = <num>
@@ -104,7 +105,6 @@ itoa_fine:
 
     # Ripristina valori originali dei registri usati
     # e restituisci il controllo al chiamante
-    popl %edi
     popl %edx
     popl %ecx
     popl %ebx

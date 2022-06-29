@@ -125,18 +125,20 @@ jnz ciclo_stringhe_piloti
 pop %esi
 
 #stampa invalid
-leal invalid_pilot_str, %esi
+leal invalid_pilot_str, %eax
+xorl %ebx, %ebx
 call copia_stringa
 jmp fine_programma
 
 pilota_trovato:
 addl $4, %esp               #elimino il vecchio valore di esi dallo stack
-
 inc %esi
 
 #LETTURA DELLE RIGHE DEL FILE
 
 #metto nello stack gli indirizzi dei parametri
+leal num_righe, %eax
+pushl %eax
 leal pilot_id, %eax
 pushl %eax
 leal v_max, %eax
@@ -157,33 +159,26 @@ jne ciclo_lettura_file
 #
 
 #elimino i parametri dallo stack
-addl $20, %esp
+addl $24, %esp
 
-
+#scrittura dell'ultima riga
 leal rpm_max, %eax
 call itoa
-leal %edi, %eax
-call copia_stringa
+movb virgola, %cl
+movb %cl, (%edi)
+inc %edi
 
-leal virgola, %eax
-copia_stringa
-
-leal %edi, %eax
 leal temp_max, %eax
 call itoa
-leal %edi, %eax
-call copia_stringa
-
-leal virgola, %eax
-copia_stringa
+movb virgola, %cl
+movb %cl, (%edi)
+inc %edi
 
 leal v_max, %eax
 call itoa
-leal %edi, %eax
-call copia_stringa
-
-leal virgola, %eax
-copia_stringa
+movb virgola, %cl
+movb %cl, (%edi)
+inc %edi
 
 leal v_max, %eax
 leal num_righe, %ebx
@@ -192,8 +187,6 @@ movb num_righe, %bl
 divb %bl # quoziente in ax
 movb %ax, %eax
 call itoa
-leal %edi, %eax
-call copia_stringa
 
 fine_programma:
 

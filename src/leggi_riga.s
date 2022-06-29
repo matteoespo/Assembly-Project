@@ -90,6 +90,9 @@ scrivi_stringa_tempo:
 
 	movl $1, %ebx
 	call copia_stringa
+	movb virgola, %bl
+	movb %bl, (%edi)
+	inc %edi
 
 	movl %ebp, %esp  			#faccio puntare esp al valore iniziale per eliminare la stringa appena scritta dallo stack
 
@@ -160,8 +163,117 @@ confronta_temperatura:
 
 	movl %eax, (%ecx)
 
+# i livelli da scrivere li salvo al momento nello stack per poi scriverli alla fine
+
 scrivi_livelli:
-	
+	#livello velocità
+	movl 8(%esp), %ebx
+	movl $100, %ecx
+	movl $250, %edx
+	pushl %eax
+
+	#livello giri
+	movl 8(%esp), %ebx
+	movl $5000, %ecx
+	movl $10000, %edx
+	pushl %eax
+
+	#livello temperatura
+	movl 8(%esp), %ebx
+	movl $90, %ecx
+	movl $110, %ecx
+	pushl %eax
+
+stampa_livello_temperatura:
+	popl %ebx
+	cmpl $0, %ebx
+	je stampa_medium_temperatura
+
+	cmpl $1, %ebx
+	je stampa_high_temperatura
+
+	#stampa low temperatura
+	leal low, %eax
+	call copia_stringa
+	movb virgola, %al
+	movb %al, (%edi)
+	jmp stampa_livello_rpm
+
+	stampa_high_temperatura:
+	leal high, %eax
+	call copia_stringa
+	movb virgola, %al
+	movb %al, (%edi)
+	jmp stampa_livello_rpm
+
+	stampa_medium_temperatura:
+	leal medium, %eax
+	call copia_stringa
+	movb virgola, %al
+	movb %al, (%edi)
+	jmp stampa_livello_rpm
+
+stampa_livello_rpm:
+	popl %ebx
+	cmpl $0, %ebx
+	je stampa_medium_rpm
+
+	cmpl $1, %ebx
+	je stampa_high_rpm
+
+	#stampa low rpm
+	leal low, %eax
+	call copia_stringa
+	movb virgola, %al
+	movb %al, (%edi)
+	jmp stampa_livello_velocita
+
+	stampa_high_rpm:
+	leal high, %eax
+	call copia_stringa
+	movb virgola, %al
+	movb %al, (%edi)
+	jmp stampa_livello_velocita
+
+	stampa_medium_rpm:
+	leal medium, %eax
+	call copia_stringa
+	movb virgola, %al
+	movb %al, (%edi)
+	jmp stampa_livello_velocita
+
+stampa_livello_velocita:
+	popl %ebx
+	cmpl $0, %ebx
+	je stampa_medium_velocita
+
+	cmpl $1, %ebx
+	je stampa_high_velocita
+
+	#stampa low velocita
+	leal low, %eax
+	call copia_stringa
+	movb line_feed, %al
+	movb %al, (%edi)
+	jmp incrementa_righe
+
+	stampa_high_velocita:
+	leal high, %eax
+	call copia_stringa
+	movb line_feed, %al
+	movb %al, (%edi)
+	jmp incrementa_righe
+
+	stampa_medium_velocita:
+	leal medium, %eax
+	call copia_stringa
+	movb line_feed, %al
+	movb %al, (%edi)
+
+incrementa_righe:
+#incremento il numero di righe trovate
+movl 24(%ebp), %eax
+addl $1, (%eax)
 
 fine_funzione_leggi_riga:
 

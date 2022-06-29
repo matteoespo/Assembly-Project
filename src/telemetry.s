@@ -48,6 +48,8 @@ len_last_pilot:
 invalid_pilot_str:
 .string "Invalid\n"
 
+virgola:
+    .ascii ","
 pilot_id:
     .long 0
 v_max:              #velocità massima trovata
@@ -135,21 +137,63 @@ inc %esi
 #LETTURA DELLE RIGHE DEL FILE
 
 #metto nello stack gli indirizzi dei parametri
-#leal pilot_id, %eax
-#pushl %eax
-#leal v_max, %eax
-#pushl %eax
-#leal rpm_max, %eax
-#pushl %eax
-#leal temp_max, %eax
-#pushl %eax
-#leal v_media, %eax
-#pushl %eax
+leal pilot_id, %eax
+pushl %eax
+leal v_max, %eax
+pushl %eax
+leal rpm_max, %eax
+pushl %eax
+leal temp_max, %eax
+pushl %eax
+leal v_media, %eax
+pushl %eax
 #
-#call leggi_riga
+ciclo_lettura_file:
+
+call leggi_riga
+
+cmp $0, %esi
+jne ciclo_lettura_file
 #
+
 #elimino i parametri dallo stack
-#addl $20, %esp
+addl $20, %esp
+
+
+leal rpm_max, %eax
+call itoa
+leal %edi, %eax
+call copia_stringa
+
+leal virgola, %eax
+copia_stringa
+
+leal %edi, %eax
+leal temp_max, %eax
+call itoa
+leal %edi, %eax
+call copia_stringa
+
+leal virgola, %eax
+copia_stringa
+
+leal v_max, %eax
+call itoa
+leal %edi, %eax
+call copia_stringa
+
+leal virgola, %eax
+copia_stringa
+
+leal v_max, %eax
+leal num_righe, %ebx
+movw v_max, %ax
+movb num_righe, %bl
+divb %bl # quoziente in ax
+movb %ax, %eax
+call itoa
+leal %edi, %eax
+call copia_stringa
 
 fine_programma:
 

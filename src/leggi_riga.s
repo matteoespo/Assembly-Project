@@ -15,19 +15,15 @@
 .section .data
 
 virgola:
-	.ascii ","
-
+	.string ","  			#ascii non mette in automatico lo \0
 line_feed:
-	.ascii "\n"
-
+	.string "\n"
 low:
-	.ascii "LOW"
-
+	.string "LOW"
 medium:
-	.ascii "MEDIUM"
-
+	.string "MEDIUM"
 high:
-	.ascii "HIGH"
+	.string "HIGH"
 
 .section .text
 .global leggi_riga
@@ -105,6 +101,10 @@ lettura_velocita:
 	call atoi
 	inc %esi
 	pushl %eax
+	#incremento velocità media
+	movl 4(%ebp), %ebx
+	addl %eax, (%ebx)
+
 lettura_rpm:
 	call atoi
 	inc %esi
@@ -140,7 +140,7 @@ confronta_velocita:
 	movl 8(%esp), %eax 			#velocità
 	movl 16(%ebp), %ecx 		#indirizzo v_max
 	movl (%ecx), %ebx 			#valore v_max
-	cmpl %eax, %ebx
+	cmpl %ebx, %eax
 	jle confronta_rpm
 
 	movl %eax, (%ecx)
@@ -149,7 +149,7 @@ confronta_rpm:
 	movl 4(%esp), %eax 			#rpm
 	movl 12(%ebp), %ecx 		#indirizzo rpm_max
 	movl (%ecx), %ebx 			#valore rpm_max
-	cmpl %eax, %ebx
+	cmpl %ebx, %eax
 	jle confronta_temperatura
 
 	movl %eax, (%ecx)
@@ -158,60 +158,39 @@ confronta_temperatura:
 	movl (%esp), %eax 			#temperatura
 	movl 8(%ebp), %ecx 			#indirizzo temp_max
 	movl (%ecx), %ebx 			#valore temp_max
-	cmpl %eax, %ebx
+	cmpl %ebx, %eax
 	jle scrivi_livelli
 
 	movl %eax, (%ecx)
 
 # i livelli da scrivere li salvo al momento nello stack per poi scriverli alla fine
 
+# i prossimi parametri da leggere sono salvati nello stack
+# 8(%esp) -> velocità
+# 4(%esp) -> rpm
+# (%esp) -> temperatura
+
 scrivi_livelli:
 	#livello velocità
 	movl 8(%esp), %ebx
 	movl $100, %ecx
 	movl $250, %edx
-	pushl %eax
-
-	#livello giri
-	movl 8(%esp), %ebx
-	movl $5000, %ecx
-	movl $10000, %edx
+	call confronta_valori
 	pushl %eax
 
 	#livello temperatura
-	movl 8(%esp), %ebx
+	movl 4(%esp), %ebx
 	movl $90, %ecx
-	movl $110, %ecx
+	movl $110, %edx
+	call confronta_valori
 	pushl %eax
 
-stampa_livello_temperatura:
-	popl %ebx
-	cmpl $0, %ebx
-	je stampa_medium_temperatura
-
-	cmpl $1, %ebx
-	je stampa_high_temperatura
-
-	#stampa low temperatura
-	leal low, %eax
-	call copia_stringa
-	movb virgola, %al
-	movb %al, (%edi)
-	jmp stampa_livello_rpm
-
-	stampa_high_temperatura:
-	leal high, %eax
-	call copia_stringa
-	movb virgola, %al
-	movb %al, (%edi)
-	jmp stampa_livello_rpm
-
-	stampa_medium_temperatura:
-	leal medium, %eax
-	call copia_stringa
-	movb virgola, %al
-	movb %al, (%edi)
-	jmp stampa_livello_rpm
+	#livello rpm
+	movl 12(%esp), %ebx
+	movl $5000, %ecx
+	movl $10000, %edx
+	call confronta_valori
+	pushl %eax
 
 stampa_livello_rpm:
 	popl %ebx
@@ -223,26 +202,57 @@ stampa_livello_rpm:
 
 	#stampa low rpm
 	leal low, %eax
+	xorl %ebx, %ebx
 	call copia_stringa
-	movb virgola, %al
-	movb %al, (%edi)
-	jmp stampa_livello_velocita
+	jmp stampa_livello_temperatura
 
 	stampa_high_rpm:
 	leal high, %eax
+	xorl %ebx, %ebx
 	call copia_stringa
-	movb virgola, %al
-	movb %al, (%edi)
-	jmp stampa_livello_velocita
+	jmp stampa_livello_temperatura
 
 	stampa_medium_rpm:
 	leal medium, %eax
+	xorl %ebx, %ebx
 	call copia_stringa
+	jmp stampa_livello_temperatura
+
+stampa_livello_temperatura:
 	movb virgola, %al
 	movb %al, (%edi)
+	inc %edi
+
+	popl %ebx
+	cmpl $0, %ebx
+	je stampa_medium_temperatura
+
+	cmpl $1, %ebx
+	je stampa_high_temperatura
+
+	#stampa low temperatura
+	leal low, %eax
+	xorl %ebx, %ebx
+	call copia_stringa
+	jmp stampa_livello_velocita
+
+	stampa_high_temperatura:
+	leal high, %eax
+	xorl %ebx, %ebx
+	call copia_stringa
+	jmp stampa_livello_velocita
+
+	stampa_medium_temperatura:
+	leal medium, %eax
+	xorl %ebx, %ebx
+	call copia_stringa
 	jmp stampa_livello_velocita
 
 stampa_livello_velocita:
+	movb virgola, %al
+	movb %al, (%edi)
+	inc %edi
+
 	popl %ebx
 	cmpl $0, %ebx
 	je stampa_medium_velocita
@@ -252,28 +262,30 @@ stampa_livello_velocita:
 
 	#stampa low velocita
 	leal low, %eax
+	xorl %ebx, %ebx
 	call copia_stringa
-	movb line_feed, %al
-	movb %al, (%edi)
 	jmp incrementa_righe
 
 	stampa_high_velocita:
 	leal high, %eax
+	xorl %ebx, %ebx
 	call copia_stringa
-	movb line_feed, %al
-	movb %al, (%edi)
 	jmp incrementa_righe
 
 	stampa_medium_velocita:
 	leal medium, %eax
+	xorl %ebx, %ebx
 	call copia_stringa
-	movb line_feed, %al
-	movb %al, (%edi)
 
 incrementa_righe:
 #incremento il numero di righe trovate
 movl 24(%ebp), %eax
 addl $1, (%eax)
+
+#aggiungo uno \n in fondo alla riga
+movb line_feed, %cl
+movb %cl, (%edi)
+inc %edi
 
 fine_funzione_leggi_riga:
 

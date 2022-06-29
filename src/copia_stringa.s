@@ -15,26 +15,23 @@ copia_stringa:
 push %ecx  					#salvo ecx perchè vado a modificarlo in seguito
 
 ciclo:
-cmp $0, (%eax)
+cmpb $0, (%eax)
 jz fine_funzione
 
 movb (%eax), %cl
 movb %cl, (%edi)
+inc %edi
 
 cmpl $0, %ebx
 jz incrementa
 
 #decrementa
 dec %eax
-jmp continua
+jmp ciclo
 
 incrementa:
 inc %eax
-
-continua:
-inc %edi
 jmp ciclo
-
 
 fine_funzione:
 

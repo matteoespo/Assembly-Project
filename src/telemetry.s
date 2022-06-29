@@ -50,6 +50,8 @@ invalid_pilot_str:
 
 virgola:
     .ascii ","
+line_feed:
+    .ascii "\n"
 pilot_id:
     .long 0
 v_max:              #velocità massima trovata
@@ -149,43 +151,48 @@ leal temp_max, %eax
 pushl %eax
 leal v_media, %eax
 pushl %eax
-#
+
 ciclo_lettura_file:
+cmp $0, (%esi)
+je fine_ciclo_lettura_file
 
 call leggi_riga
+jmp ciclo_lettura_file
 
-cmp $0, %esi
-jne ciclo_lettura_file
-#
+fine_ciclo_lettura_file:
 
 #elimino i parametri dallo stack
 addl $24, %esp
 
 #scrittura dell'ultima riga
-leal rpm_max, %eax
+movl rpm_max, %eax
 call itoa
 movb virgola, %cl
 movb %cl, (%edi)
 inc %edi
 
-leal temp_max, %eax
+movl temp_max, %eax
 call itoa
 movb virgola, %cl
 movb %cl, (%edi)
 inc %edi
 
-leal v_max, %eax
+movl v_max, %eax
 call itoa
 movb virgola, %cl
 movb %cl, (%edi)
 inc %edi
 
 xorl %edx, %edx
-movl v_max, %eax
+movl v_media, %eax
 movl num_righe, %ecx
 divl %ecx
-movl %edx, %eax # sposto il risultato in eax per poterlo usare con itoa
+movl %eax, %edx # sposto il risultato in eax per poterlo usare con itoa
 call itoa
+
+movb line_feed, %al
+movb %al, (%edi)
+inc %edi
 
 fine_programma:
 

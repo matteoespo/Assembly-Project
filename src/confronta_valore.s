@@ -1,4 +1,4 @@
-# funzione che mette a confronto un valore passato come parametro con il rispettivo minimo e massimo sempre passati come parametro
+# funzione che mette a confronto un valore passato come parametro con il rispettivo minimo e massimo sempre passati come parametro.
 # Parametri input: ebx (valore da confrontare), ecx (valore minimo), edx (valore massimo)
 # Parametri output:	eax --> risultato confronto 
 # La funzione ritorna 0 se i il valore è > del minimo e <= del massimo, -1 se il valore è <= rispetto al minimo, 1 se maggiore del massimo)

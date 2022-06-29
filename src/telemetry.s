@@ -180,12 +180,11 @@ movb virgola, %cl
 movb %cl, (%edi)
 inc %edi
 
-leal v_max, %eax
-leal num_righe, %ebx
-movw v_max, %ax
-movb num_righe, %bl
-divb %bl # quoziente in ax
-movb %ax, %eax
+movl edx, 0
+movl v_max, %eax
+movl num_righe, %ecx
+divl %ecx
+movl %edx, %eax # sposto il risultato in eax per poterlo usare con itoa
 call itoa
 
 fine_programma:

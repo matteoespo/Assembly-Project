@@ -180,7 +180,7 @@ movb virgola, %cl
 movb %cl, (%edi)
 inc %edi
 
-movl edx, 0
+movl %edx, $0
 movl v_max, %eax
 movl num_righe, %ecx
 divl %ecx

@@ -198,5 +198,3 @@ pop %ebx
 pop %eax
 
 ret
-
-

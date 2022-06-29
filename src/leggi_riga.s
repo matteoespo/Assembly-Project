@@ -38,7 +38,7 @@ leggi_riga:
 
 # Lettura del tempo che viene memorizzato nello stack
 
-movl %esp, %ebp  			#ebp punta ora al pc e lo uso anche per puntare ai parametri passati
+movl %esp, %ebp  			#ebp punta ora al pc e lo uso anche per recuperare i parametri passati
 xorl %ebx, %ebx 			#in ebx memorizzo la lunghezza della stringa del tempo
 
 lettura_stringa_tempo:
@@ -47,19 +47,23 @@ lettura_stringa_tempo:
 	cmp virgola, %dl
 	jz stringa_tempo_finita
 
-	push %dx
-	inc %bl
+	dec %esp
+	movb %dl, (%esp)
+	#push %dx
+	inc %ebx
 	jmp lettura_stringa_tempo
 
 stringa_tempo_finita:
-	pushw $0
+	dec %esp
+	movb $0, (%esp)
+	#pushw $0
 	inc %bl
 
-	#calcolo della lunghezza effettiva della stringa del tempo, data da: (numero di caratteri)*2 perchè ogni carattere è salvato su due byte
-	movl %ebx, %eax 			#sposto la lunghezza della stringa in eax per fare la moltiplicazione
-	mov $2, %bl
-	mulb %bl 					#moltiplico la lunghezza della stringa per 4
-	push %eax 					#salvo la lunghezza nello stack
+	##calcolo della lunghezza effettiva della stringa del tempo, data da: (numero di caratteri)*2 perchè ogni carattere è salvato su due byte
+	#movl %ebx, %eax 			#sposto la lunghezza della stringa in eax per fare la moltiplicazione
+	#mov $2, %bl
+	#mulb %bl 					#moltiplico la lunghezza della stringa per 4
+	push %ebx 					#salvo la lunghezza nello stack
 
 # Lettura dell'id del pilota e controllo che sia quello che cerchiamo
 lettura_id:
@@ -79,16 +83,13 @@ id_diverso:
 	jmp fine_funzione_leggi_riga
 
 scrivi_stringa_tempo:
-	popl %ecx 					#recupero dallo stack la lunghezza della stringa
-	subl $2, %ecx
+	popl %ebx 					#recupero dallo stack la lunghezza della stringa
+	movl %esp, %eax 			#incremento esp di tale lunghezza-1 per puntare all'inizio della stringa
+	addl %ebx, %eax
+	subl $1, %eax
 
-	scrivi_carattere_stringa_tempo:
-		movw (%esp, %ecx), %ax
-		movb %al, (%edi)
-		incl %edi
-		subl $2, %ecx
-		cmpw $0, (%esp, %ecx)
-		jnz scrivi_carattere_stringa_tempo
+	movl $1, %ebx
+	call copia_stringa
 
 	movl %ebp, %esp  			#faccio puntare esp al valore iniziale per eliminare la stringa appena scritta dallo stack
 
@@ -149,7 +150,7 @@ confronta_rpm:
 	jle confronta_temperatura
 
 	movl %eax, (%ecx)
-	
+
 confronta_temperatura:
 	movl (%esp), %eax 			#temperatura
 	movl 8(%ebp), %ecx 			#indirizzo temp_max

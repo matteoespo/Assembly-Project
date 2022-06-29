@@ -1,6 +1,7 @@
-# funzione che confronta due valori passati come parametro alla funzione
-# Parametri input: ebx, ecx --> valori da confrontare
-# Parametri output:	eax --> risultato confronto (0 se i due numeri sono uguali, 1 se il valore contenuto in ebx è maggiore rispetto a quello contenuto in ecx, -1 viceversa)
+# funzione che mette a confronto un valore passato come parametro con il rispettivo minimo e massimo sempre passati come parametro
+# Parametri input: ebx (valore da confrontare), ecx (valore minimo), edx (valore massimo)
+# Parametri output:	eax --> risultato confronto 
+# La funzione ritorna 0 se i il valore è > del minimo e <= del massimo, -1 se il valore è <= rispetto al minimo, 1 se maggiore del massimo)
 
 .section .data
 .section .text
@@ -11,21 +12,25 @@ confronta_valori:
 
 
 xorl %eax, %eax   # azzero il registro eax il quale conterrà l'esito del confronto
-cmpl %ebx, %ecx
-je EQUAL       # ebx = ecx
-jg GREATER     # ebx > ecx
-jmp LESS       # ebx < ecx
+cmpl %ebx, %ecx	  # confronto il valore passato come parametro con il minimo
+jle LESS_EQUAL       
+jmp GREATER_THAN_MIN     
 
-EQUAL:
-	movl $0, %eax
+LESS_EQUAL:		# ebx <= ecx
+	movl $-1, %eax
 	jmp FINE_CONFRONTA_VALORI
 	
-GREATER:
+GREATER_THAN_MIN:	# ebx > ecx
+	cmpl %ebx, %edx
+	jg GREATER_THAN_MAX 
+	jmp WITHIN_THE_RANGE
+
+GREATER_THAN_MAX: 	# ebx > edx > ecx
 	movl $1, %eax
 	jmp FINE_CONFRONTA_VALORI
-	
-LESS:
-	movl $-1, %eax
+
+WITHIN_THE_RANGE: 	# ebx > ecx && ebx <= edx
+	movl $0, %eax
 
 FINE_CONFRONTA_VALORI:
 	ret

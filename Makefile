@@ -19,8 +19,11 @@ obj/confronta_valori.o: src/confronta_valori.s
 obj/leggi_riga.o: src/leggi_riga.s
 	gcc -m32 -c -g src/leggi_riga.s -o obj/leggi_riga.o
 
-bin/telemetry: obj/telemetry.o obj/copia_stringa.o obj/main.o obj/confronta_valori.o obj/atoi.o obj/leggi_riga.o
-	gcc -m32 -g obj/telemetry.o obj/copia_stringa.o obj/main.o obj/confronta_valori.o obj/atoi.o obj/leggi_riga.o -o bin/telemetry
+obj/itoa.o: src/itoa.s
+	gcc -m32 -c -g src/itoa.s -o obj/itoa.o
+
+bin/telemetry: obj/telemetry.o obj/copia_stringa.o obj/main.o obj/confronta_valori.o obj/atoi.o obj/leggi_riga.o obj/itoa.o
+	gcc -m32 -g obj/telemetry.o obj/copia_stringa.o obj/main.o obj/confronta_valori.o obj/atoi.o obj/leggi_riga.o obj/itoa.o -o bin/telemetry
 
 clean:
 	rm -f obj/*.o bin/telemetry

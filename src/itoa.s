@@ -18,14 +18,13 @@ itoa:
     pushl %ebp
     movl %esp, %ebp
 
-    pushl %eax
     pushl %ebx
     pushl %ecx
     pushl %edx
 
     # inizia algoritmo per convertire intero in stringa
-    movl 8(%ebp), %eax            # EAX = <num>
-    movl 12(%ebp), %edi           # EDI = <output>
+    #movl 8(%ebp), %eax            # EAX = <num>
+    #movl 12(%ebp), %edi           # EDI = <output>
     movb $0, itoa_is_negative     # itoa_is_negative = 0 (<num> e' negativo)
                                   # (utile quando un programma usa un ciclo:
                                   # ogni volta che la funzione viene richiamata itoa_is_negative NON viene impostato a 1 automaticamente)
@@ -90,7 +89,8 @@ itoa_scrivi:
 
     popl %eax               # EAX = cifra nello stack
     addb $48, %al           # EAX += 48 (converto intero in cifra)
-    movb %al, (%edi, %ebx)  # EDI[EBX] = EAX (aggiungo cifra alla stringa)
+    movb %al, (%edi)        # EDI[EBX] = EAX (aggiungo cifra alla stringa)
+    inc %edi
     incl %ebx               # incrementa di 1 l'indice
 
     jmp itoa_scrivi         # ritorna all'etichetta itoa_scrivi per stampare
@@ -98,16 +98,14 @@ itoa_scrivi:
 
 
 itoa_fine:
-    # Fine algoritmo: metti \0 a fine stringa,
     # ripristina i valori dei registri e ritorna al chiamante
 
-    movb $0, (%edi, %ecx)  # EDI[ECX] = '\0'
+    #movb $10, (%edi)  # EDI[ECX] = '\0'
 
     # Ripristina valori originali dei registri usati
     # e restituisci il controllo al chiamante
     popl %edx
     popl %ecx
     popl %ebx
-    popl %eax
     popl %ebp
-    ret
+ret

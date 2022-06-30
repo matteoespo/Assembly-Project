@@ -1,7 +1,15 @@
 # funzione che mette a confronto un valore passato come parametro con il rispettivo minimo e massimo sempre passati come parametro.
-# Parametri input: ebx (valore da confrontare), ecx (valore minimo), edx (valore massimo)
-# Parametri output:	eax --> risultato confronto 
-# La funzione ritorna 0 se i il valore è > del minimo e <= del massimo, -1 se il valore è <= rispetto al minimo, 1 se maggiore del massimo)
+#
+# Descrizione variabili e parametri:
+#
+# Parametri input: 
+#	• ebx --> valore da confrontare;
+#	• ecx --> valore minimo dell'intervallo;
+#	• edx --> valore massimo dell'intervallo;
+#
+# Valore di ritorno:	
+#	• eax --> risultato del confronto, vale 0 se il valore in ebx è > del minimo (ecx) e <= del massimo (edx),
+#		-1 se il valore è <= rispetto al minimo (ecx), 1 se maggiore del massimo (edx).
 
 .section .data
 .section .text

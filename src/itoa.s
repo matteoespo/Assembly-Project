@@ -1,40 +1,34 @@
+# converte un valore intero positivo in una stringa
+# parametri:
 # eax = valore da convertire
-# edi = indirizzo dove salvare la stringa
+# edi = indirizzo di memoria dove salvare la stringa
 
 .section .data
 .section .text
-    .global itoa
+.global itoa
 
 .type itoa, @function
 
 itoa:
+    
+    #salvo i registri che verranno usati dalla funzione
     pushl %ebx
     pushl %ecx
     pushl %edx
 
-    movl   $0, %ecx     # carica il numero 0 in %ecx
-
+    xorl %ecx, %ecx     #lunghezza stringa
 
 continua_a_dividere:
 
     cmpl   $10, %eax    # confronta 10 con il contenuto di %eax
 
-    jge dividi          # salta all'etichetta dividi se %eax e'
-                        # maggiore o uguale a 10
+    jge dividi          # salta a dividi se eax >= 10
 
-    pushl %eax          # salva nello stack il contenuto di %eax
-    incl   %ecx         # incrementa di 1 il valore di %ecx per
-                        # contare quante push eseguo;
-                        # ad ogni push salvo nello stack una cifra 
-                        # del numero (a partire da quella meno
-                        # significativa)
-
-    movl  %ecx, %ebx    # copia in %ebx il valore di %ecx
-                        # il numero di cifre che sono state 
-                        # caricate nello stack
+    pushl %eax
+    incl   %ecx
+    movl  %ecx, %ebx
 
     jmp stampa          # salta all'etichetta stampa
-
 
 dividi:
 
@@ -48,8 +42,7 @@ dividi:
 stampa:
 
     cmpl   $0, %ebx
-    je fine_itoa        # se %ebx=0 ho stampato tutto salto alla 
-                        # fine della funzione
+    je fine_itoa        # se %ebx=0 è stato stampato tutto e si salta alla fine della funzione
 
     popl  %eax          # preleva l'elemento da stampare dallo stack
 

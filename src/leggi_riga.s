@@ -45,20 +45,13 @@ lettura_stringa_tempo:
 
 	dec %esp
 	movb %dl, (%esp)
-	#push %dx
 	inc %ebx
 	jmp lettura_stringa_tempo
 
 stringa_tempo_finita:
 	dec %esp
 	movb $0, (%esp)
-	#pushw $0
 	inc %bl
-
-	##calcolo della lunghezza effettiva della stringa del tempo, data da: (numero di caratteri)*2 perchè ogni carattere è salvato su due byte
-	#movl %ebx, %eax 			#sposto la lunghezza della stringa in eax per fare la moltiplicazione
-	#mov $2, %bl
-	#mulb %bl 					#moltiplico la lunghezza della stringa per 4
 	push %ebx 					#salvo la lunghezza nello stack
 
 # Lettura dell'id del pilota e controllo che sia quello che cerchiamo
@@ -69,7 +62,7 @@ lettura_id:
 	cmpl (%ecx), %eax  			#confronto con il valore che c'è nel file di input
 	jz scrivi_stringa_tempo
 
-# Se l'id è diverso, incremento esi fino a farlo puntare alla prossima riga
+# Se l'id è diverso, incremento esi fino a farlo puntare alla prossima riga e termino la funzione
 id_diverso:
 	incl %esi
 	movb (%esi), %dl
@@ -80,17 +73,17 @@ id_diverso:
 
 scrivi_stringa_tempo:
 	popl %ebx 					#recupero dallo stack la lunghezza della stringa
-	movl %esp, %eax 			#incremento esp di tale lunghezza-1 per puntare all'inizio della stringa
+	movl %esp, %eax 			#incremento %esp di tale lunghezza-1 per puntare all'inizio della stringa
 	addl %ebx, %eax
 	subl $1, %eax
 
-	movl $1, %ebx
+	movl $1, %ebx 				#copia stringa decrementando %eax
 	call copia_stringa
 	movb virgola, %bl
 	movb %bl, (%edi)
 	inc %edi
 
-	movl %ebp, %esp  			#faccio puntare esp al valore iniziale per eliminare la stringa appena scritta dallo stack
+	movl %ebp, %esp  			#faccio puntare %esp al valore iniziale per eliminare la stringa appena scritta dallo stack
 
 # i prossimi parametri da leggere sono salvati nello stack
 # 8(%esp) -> velocità
@@ -101,6 +94,7 @@ lettura_velocita:
 	call atoi
 	inc %esi
 	pushl %eax
+
 	#incremento velocità media
 	movl 4(%ebp), %ebx
 	addl %eax, (%ebx)
@@ -109,6 +103,7 @@ lettura_rpm:
 	call atoi
 	inc %esi
 	pushl %eax
+
 lettura_temperatura:
 	call atoi
 	inc %esi
@@ -164,11 +159,6 @@ confronta_temperatura:
 	movl %eax, (%ecx)
 
 # i livelli da scrivere li salvo al momento nello stack per poi scriverli alla fine
-
-# i prossimi parametri da leggere sono salvati nello stack
-# 8(%esp) -> velocità
-# 4(%esp) -> rpm
-# (%esp) -> temperatura
 
 scrivi_livelli:
 	#livello velocità

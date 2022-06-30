@@ -10,7 +10,6 @@
 .type confronta_valori, @function
 confronta_valori:
 
-
 xorl %eax, %eax   # azzero il registro eax il quale conterrà l'esito del confronto
 cmpl %ecx, %ebx	  # confronto il valore passato come parametro con il minimo
 jle LESS_EQUAL       

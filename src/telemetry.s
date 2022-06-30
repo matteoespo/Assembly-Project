@@ -73,7 +73,7 @@ telemetry:
 movl 4(%esp), %esi                  #puntatore al file di input
 movl 8(%esp), %edi                  #puntatore al file di output
 
-#salvataggio dei registri generali nello stack
+#salvataggio dei registri nello stack
 push %eax
 push %ebx
 push %ecx
@@ -186,8 +186,7 @@ inc %edi
 xorl %edx, %edx
 movl v_media, %eax
 movl num_righe, %ecx
-divl %ecx
-movl %eax, %edx # sposto il risultato in eax per poterlo usare con itoa
+divl %ecx               #in eax c'è il risultato della divisione
 call itoa
 
 movb line_feed, %al
